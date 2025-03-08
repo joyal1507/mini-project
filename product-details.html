@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Details</title>
+    <link rel="stylesheet" href="detailsstyle.css">
+</head>
+<body>
+    <div class="container">
+        <h1 id="productName"></h1>
+        <div id="productImages"></div> <!-- Container for multiple images -->
+        <p id="productFeatures"></p>
+        <p id="fixedPrice"></p>
+        <p id="bidPrice"></p>
+        <p id="timeRemaining"></p>
+
+        <button onclick="buyNow()">Buy Now</button>
+        <button onclick="bidNow()">Bid Now</button>
+    </div>
+
+    <script>
+        async function displayProductDetails() {
+            let itemId = localStorage.getItem("selectedItemId");
+            if (!itemId) {
+                window.location.href = "buyitem.html";
+                return;
+            }
+    
+            let response = await fetch(`http://localhost:5000/api/items/${itemId}`);
+            let item = await response.json();
+    
+            let remainingTimeMs = Math.max(0, item.expirationTime - Date.now());
+            let hours = Math.floor(remainingTimeMs / (1000 * 60 * 60));
+            let minutes = Math.floor((remainingTimeMs % (1000 * 60 * 60)) / (1000 * 60));
+            let seconds = Math.floor((remainingTimeMs % (1000 * 60)) / 1000);
+    
+            document.getElementById("productName").innerText = item.productName;
+            document.getElementById("productFeatures").innerText = "Features: " + item.features;
+            document.getElementById("fixedPrice").innerText = "Fixed Price: ₹" + item.price;
+            document.getElementById("bidPrice").innerText = "Starting Bid: ₹" + item.bidPrice;
+            document.getElementById("timeRemaining").innerText = `Time Remaining: ${hours}h ${minutes}m ${seconds}s`;
+    
+            let imagesContainer = document.getElementById("productImages");
+            imagesContainer.innerHTML = "";
+            item.imagesArray.forEach(imgSrc => {
+                let imgElement = document.createElement("img");
+                imgElement.src = imgSrc;
+                imgElement.width = 300;
+                imagesContainer.appendChild(imgElement);
+            });
+        }
+    
+        displayProductDetails();
+        setInterval(displayProductDetails, 1000);
+    </script>
+    
+    
+</body>
+</html>

@@ -1,0 +1,80 @@
+/* Import Google Font */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+/* Reset and Global Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    background: url('https://png.pngtree.com/back_origin_pic/04/48/50/84cd2a9fbc6cbd5522b2f048a56703a8.jpg') no-repeat center center fixed;
+    background-size: cover;  /* Ensures the image covers the entire page */
+    color: #333;
+    line-height: 1.8;
+    padding: 20px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    text-align: center;
+}
+
+h1 {
+    font-size: 2rem;
+    margin-bottom: 30px;
+}
+
+/* Buttons */
+button {
+    width: 300px;
+    height: 80px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center; /* Centers vertically */
+    justify-content: center; /* Centers horizontally */
+    gap: 10px;
+    transition: 0.3s;
+    background-size: 30px;
+    background-repeat: no-repeat;
+    background-position: left 15px center;
+    padding-left: 20px; /* Adjust this */
+    text-align: center; /* Ensures text alignment */
+}
+
+
+/* Buy Button */
+button:first-of-type {
+    background-color: #007bff;
+    color: white;
+    background-image: url('buy-icon.png'); /* Replace with your buy image */
+}
+
+button:first-of-type:hover {
+    background-color: #0056b3;
+}
+
+/* Sell Button */
+button:last-of-type {
+    background-color: #28a745;
+    color: white;
+    background-image: url('sell-icon.png'); /* Replace with your sell image */
+}
+
+button:last-of-type:hover {
+    background-color: #1e7e34;
+}
+
+/* Button Container */
+a {
+    text-decoration: none;
+    margin: 10px;
+}
