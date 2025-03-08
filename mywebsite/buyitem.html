@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buy an Item</title>
+    <link rel="stylesheet" href="buystyle.css">
+</head>
+<body>
+    <h1>Available Items</h1>
+    <div id="itemsList"></div>
+
+    <script>
+        let items = JSON.parse(localStorage.getItem("items")) || [];
+        
+        function displayItemsList() {
+            let itemsDiv = document.getElementById("itemsList");
+            itemsDiv.innerHTML = "";
+
+            let currentTime = Date.now();
+            items = items.filter(item => item.expirationTime > currentTime); // Remove expired items
+
+            localStorage.setItem("items", JSON.stringify(items)); // Update localStorage
+
+            items.forEach((item, index) => {
+                let itemDiv = document.createElement("div");
+                itemDiv.classList.add("item-card");
+
+                let firstImage = Array.isArray(item.imagesArray) && item.imagesArray.length > 0 ? item.imagesArray[0] : item.imageUrl;
+
+                itemDiv.innerHTML = `
+                    <h3>${item.productName}</h3>
+                    <img src="${firstImage}" width="200">
+                    <p id="time-${index}">Time Remaining: </p>
+                `;
+
+                // Make entire div clickable to view details
+                itemDiv.onclick = () => viewDetails(index);
+
+                itemsDiv.appendChild(itemDiv);
+            });
+
+            updateTimeRemaining(); // Start countdown updates
+        }
+
+        function updateTimeRemaining() {
+            let currentTime = Date.now();
+
+            items.forEach((item, index) => {
+                let remainingTimeMs = Math.max(0, item.expirationTime - currentTime);
+                let hours = Math.floor(remainingTimeMs / (1000 * 60 * 60));
+                let minutes = Math.floor((remainingTimeMs % (1000 * 60 * 60)) / (1000 * 60));
+                let seconds = Math.floor((remainingTimeMs % (1000 * 60)) / 1000);
+
+                let timeElement = document.getElementById(`time-${index}`);
+                if (timeElement) {
+                    timeElement.innerText = `Time Remaining: ${hours}h ${minutes}m ${seconds}s`;
+                }
+            });
+        }
+
+        function viewDetails(index) {
+            localStorage.setItem("selectedItemIndex", index);
+            window.location.href = "product-details.html";
+        }
+
+        displayItemsList();
+        setInterval(updateTimeRemaining, 1000); // Update only the countdown text every second
+    </script>
+</body>
+</html>

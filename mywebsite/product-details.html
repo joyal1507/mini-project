@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Details</title>
+    <link rel="stylesheet" href="detailsstyle.css">
+</head>
+<body>
+    <div class="container">
+        <h1 id="productName"></h1>
+        <div id="productImages"></div> <!-- Container for multiple images -->
+        <p id="productFeatures"></p>
+        <p id="fixedPrice"></p>
+        <p id="bidPrice"></p>
+        <p id="timeRemaining"></p>
+
+        <button onclick="buyNow()">Buy Now</button>
+        <button onclick="bidNow()">Bid Now</button>
+    </div>
+
+    <script>
+        function displayProductDetails() {
+            let items = JSON.parse(localStorage.getItem("items")) || [];
+            let index = localStorage.getItem("selectedItemIndex");
+            if (index === null || !items[index]) {
+                window.location.href = "buy.html";
+                return;
+            }
+
+            let item = items[index];
+
+            document.getElementById("productName").innerText = item.productName;
+            document.getElementById("productFeatures").innerText = "Features: " + item.features;
+            document.getElementById("fixedPrice").innerText = "Fixed Price: ₹" + item.price;
+            document.getElementById("bidPrice").innerText = "Starting Bid: ₹" + item.bidPrice;
+
+            // Display all images in order
+            let imagesContainer = document.getElementById("productImages");
+            imagesContainer.innerHTML = ""; // Clear previous images
+            let imagesArray = Array.isArray(item.imagesArray) ? item.imagesArray : [item.imageUrl];
+
+            imagesArray.forEach(imgSrc => {
+                let imgElement = document.createElement("img");
+                imgElement.src = imgSrc;
+                imgElement.width = 300;
+                imgElement.style.margin = "5px";
+                imagesContainer.appendChild(imgElement);
+            });
+
+            updateTimeRemaining();
+            setInterval(updateTimeRemaining, 1000); // Update every second
+        }
+
+        function updateTimeRemaining() {
+            let items = JSON.parse(localStorage.getItem("items")) || [];
+            let index = localStorage.getItem("selectedItemIndex");
+            if (index === null || !items[index]) return;
+
+            let item = items[index];
+            let currentTime = Date.now();
+            let remainingTimeMs = Math.max(0, item.expirationTime - currentTime);
+
+            let hours = Math.floor(remainingTimeMs / (1000 * 60 * 60));
+            let minutes = Math.floor((remainingTimeMs % (1000 * 60 * 60)) / (1000 * 60));
+            let seconds = Math.floor((remainingTimeMs % (1000 * 60)) / 1000);
+
+            let timeRemainingText = remainingTimeMs > 0 
+                ? `Time Remaining: ${hours}h ${minutes}m ${seconds}s`
+                : "Expired";
+
+            document.getElementById("timeRemaining").innerText = timeRemainingText;
+        }
+
+        function buyNow() {
+            alert("Proceeding to Buy Now...");
+        }
+
+        function bidNow() {
+            alert("Proceeding to Bid Now...");
+        }
+
+        displayProductDetails();
+    </script>
+</body>
+</html>

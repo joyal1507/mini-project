@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sell an Item</title>
+    <link rel="stylesheet" href="sellstyle.css">
+</head>
+<body>
+    <h1>Sell an Item</h1>
+    <form id="sellForm">
+        <label for="product_name">Product Name:</label>
+        <input type="text" id="product_name" required>
+
+        <label for="features">Features:</label>
+        <textarea id="features" required></textarea>
+
+        <label for="price">Fixed Price:</label>
+        <input type="number" id="price" step="0.01" required>
+
+        <label for="bid_price">Starting Bid Price:</label>
+        <input type="number" id="bid_price" step="0.01" required>
+
+        <label for="time_limit">Time Limit (in hours):</label>
+        <input type="number" id="time_limit" min="1" required>
+
+        <label for="product_images">Upload Images:</label>
+        <input type="file" id="product_images" accept="image/*" multiple required>
+
+        <button type="submit">List Item</button>
+    </form>
+
+    <h2>HISTORY</h2>
+    <div id="history"></div>
+
+    <script>
+        document.getElementById("sellForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            let productName = document.getElementById("product_name").value;
+            let features = document.getElementById("features").value;
+            let price = document.getElementById("price").value;
+            let bidPrice = document.getElementById("bid_price").value;
+            let timeLimit = document.getElementById("time_limit").value;
+            let imagesInput = document.getElementById("product_images").files;
+
+            let expirationTime = Date.now() + timeLimit * 60 * 60 * 1000; // Convert hours to milliseconds
+            let imagesArray = [];
+
+            if (imagesInput.length > 0) {
+                let imagesProcessed = 0;
+                for (let i = 0; i < imagesInput.length; i++) {
+                    let reader = new FileReader();
+                    reader.readAsDataURL(imagesInput[i]);
+                    reader.onload = function () {
+                        imagesArray.push(reader.result);
+                        imagesProcessed++;
+                        if (imagesProcessed === imagesInput.length) {
+                            saveItem();
+                        }
+                    };
+                }
+            } else {
+                saveItem();
+            }
+
+            function saveItem() {
+                let item = { productName, features, price, bidPrice, imagesArray, expirationTime };
+                let items = JSON.parse(localStorage.getItem("items")) || [];
+                items.push(item);
+                localStorage.setItem("items", JSON.stringify(items));
+
+                location.reload(); // Reload to update history
+            }
+        });
+
+        function displayHistory() {
+            let items = JSON.parse(localStorage.getItem("items")) || [];
+            let historyDiv = document.getElementById("history");
+            historyDiv.innerHTML = "";
+
+            let currentTime = Date.now();
+            
+            items.forEach((item, index) => {
+                let remainingTimeMs = Math.max(0, item.expirationTime - currentTime); // Remaining time in milliseconds
+                let hours = Math.floor(remainingTimeMs / (1000 * 60 * 60));
+                let minutes = Math.floor((remainingTimeMs % (1000 * 60 * 60)) / (1000 * 60));
+
+                let itemDiv = document.createElement("div");
+                itemDiv.innerHTML = `<h3>${item.productName}</h3>`;
+
+                item.imagesArray.forEach(image => {
+                    let imgElement = document.createElement("img");
+                    imgElement.src = image;
+                    imgElement.width = 100;
+                    itemDiv.appendChild(imgElement);
+                });
+
+                itemDiv.innerHTML += `<p>Time Remaining: ${hours}h ${minutes}m</p>
+                                      <button onclick="deleteItem(${index})">Delete</button>`;
+                
+                historyDiv.appendChild(itemDiv);
+            });
+        }
+
+        function deleteItem(index) {
+            let items = JSON.parse(localStorage.getItem("items")) || [];
+            items.splice(index, 1);
+            localStorage.setItem("items", JSON.stringify(items));
+            location.reload();
+        }
+
+        displayHistory();
+    </script>
+</body>
+</html>
